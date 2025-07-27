@@ -7,14 +7,14 @@
 # Python 3.11.2 / debian12
 # API v4r7 で動作確認
 # 立花証券ｅ支店ＡＰＩ利用のサンプルコード
+#
 # 機能: 現物可能額取得
 #
 # 利用方法: 
 # 事前に「e_api_login_tel.py」を実行して、仮想URL等を取得しておいてください。
 #
-#
 # == ご注意: ========================================
-#   本番環境にに接続した場合、実際に市場に注文を出せます。
+#   本番環境にに接続した場合、実際に市場に注文が出ます。
 #   市場で約定した場合取り消せません。
 # ==================================================
 #
@@ -57,6 +57,7 @@ class class_def_login_property:
         self.sUrlPrice = ''         # price用仮想URL
         self.sUrlEvent = ''         # event用仮想URL
         self.sZyoutoekiKazeiC = ''  # 8.譲渡益課税区分    1：特定  3：一般  5：NISA     ログインの返信データで設定済み。 
+        self.sSinyouKouzaKubun = '' # 信用取引口座開設区分  0：未開設  1：開設
         self.sSecondPassword = ''   # 22.第二パスワード  APIでは第２暗証番号を省略できない。 関連資料:「立花証券・e支店・API、インターフェース概要」の「3-2.ログイン、ログアウト」参照
         self.sJsonOfmt = ''         # 返り値の表示形式指定
         
@@ -291,16 +292,17 @@ def func_get_acconut_info(fname, class_account_property):
 # 機能： ログイン情報をファイルから取得する
 # 引数1: ログイン情報を保存したファイル名（fname_login_response = "e_api_login_response.txt"）
 # 引数2: ログインデータ型（class_def_login_property型）
-def func_get_login_info(str_fname, class_login_property):
+def func_get_login_info(str_fname, my_login_property):
     str_login_respons = func_read_from_file(str_fname)
     dic_login_respons = json.loads(str_login_respons)
-    class_login_property.sUrlRequest = dic_login_respons.get('sUrlRequest')                # request用仮想URL
-    class_login_property.sUrlMaster = dic_login_respons.get('sUrlMaster')                  # master用仮想URL
-    class_login_property.sUrlPrice = dic_login_respons.get('sUrlPrice')                    # price用仮想URL
-    class_login_property.sUrlEvent = dic_login_respons.get('sUrlEvent')                    # event用仮想URL
-    class_login_property.sUrlEventWebSocket = dic_login_respons.get('sUrlEventWebSocket')  # webxocket用仮想URL
-    class_login_property.sZyoutoekiKazeiC = dic_login_respons.get('sZyoutoekiKazeiC')      # 8.譲渡益課税区分    1：特定  3：一般  5：NISA     ログインの返信データで設定済み。 
-    
+    my_login_property.sUrlRequest = dic_login_respons.get('sUrlRequest')                # request用仮想URL
+    my_login_property.sUrlMaster = dic_login_respons.get('sUrlMaster')                  # master用仮想URL
+    my_login_property.sUrlPrice = dic_login_respons.get('sUrlPrice')                    # price用仮想URL
+    my_login_property.sUrlEvent = dic_login_respons.get('sUrlEvent')                    # event用仮想URL
+    my_login_property.sUrlEventWebSocket = dic_login_respons.get('sUrlEventWebSocket')  # webxocket用仮想URL
+    my_login_property.sZyoutoekiKazeiC = dic_login_respons.get('sZyoutoekiKazeiC')      # 8.譲渡益課税区分    1：特定  3：一般  5：NISA     ログインの返信データで設定済み。 
+    my_login_property.sZyoutoekiKazeiC = dic_login_respons.get('sSinyouKouzaKubun')     # 信用取引口座開設区分  0：未開設  1：開設     ログインの返信データで設定済み。 
+
 
 # 機能： p_noをファイルから取得する
 # 引数1: p_noを保存したファイル名（fname_info_p_no = "e_api_info_p_no.txt"）
@@ -341,9 +343,6 @@ def func_save_p_no(str_fname_output, int_p_no):
 #--- 以上 共通コード -------------------------------------------------
 
 
-
-
-
 # 参考資料（必ず最新の資料を参照してください。）
 #マニュアル
 #「立花証券・ｅ支店・ＡＰＩ（v4r2）、REQUEST I/F、機能毎引数項目仕様」
@@ -354,9 +353,9 @@ def func_save_p_no(str_fname_output, int_p_no):
 #  1 sCLMID	メッセージＩＤ	char*	I/O	"CLMZanKaiKanougaku"
 #  2 sIssueCode	銘柄コード	char[12]	I/O	銘柄コード（6501 等）
 #  3 sSizyouC	市場	char[2]	I/O	00：東証"
-#  4 sResultCode	結果コード	char[9]	O	０：ＯＫ、０以外：CLMMsgTable.sMsgIdで検索しテキストを表示。 0～999999999、左詰め、マイナスの場合なし
+#  4 sResultCode	結果コード	char[9]	O	0：ＯＫ、0以外：CLMMsgTable.sMsgIdで検索しテキストを表示。 0～999999999、左詰め、マイナスの場合なし
 #  5 sResultText	結果テキスト	char[512]	O	ShiftJis"
-#  6 sWarningCode	警告コード	char[9]	O	０：ＯＫ、０以外：CLMMsgTable.sMsgIdで検索しテキストを表示。 0～999999999、左詰め、マイナスの場合なし
+#  6 sWarningCode	警告コード	char[9]	O	0：ＯＫ、0以外：CLMMsgTable.sMsgIdで検索しテキストを表示。 0～999999999、左詰め、マイナスの場合なし
 #  7 sWarningText	警告テキスト	char[512]	O	ShiftJis"
 #  8 sSummaryUpdate	更新日時	char[12]	O	YYYYMMDDHHMM 照会機能仕様書 ２－４．（３）、(以下は標準WebになくRich-I/Fにある項目) No.1
 #  9 sSummaryGenkabuKaituke	株式現物買付可能額	char[16]	O	照会機能仕様書 ２－４．（３）、（A）現物取引 - 買付注文 - 通常 No.4。 0～9999999999999999、左詰め、マイナスの場合なし
@@ -446,21 +445,19 @@ if __name__ == "__main__":
 
     print()
     print('-- 現物買余力の照会 -------------------------------------------------------------')
-    json_return = func_kanougaku_genbutsu(my_login_property.p_no, my_login_property)
+    dic_return = func_kanougaku_genbutsu(my_login_property.p_no, my_login_property)
     # 戻り値の解説は、マニュアル「立花証券・ｅ支店・ＡＰＩ（ｖ〇）、REQUEST I/F、機能毎引数項目仕様」
     # p13/46 No.10 CLMZanKaiKanougaku を参照してください。
     
-    print('更新日時= ', json_return.get("sSummaryUpdate"))     # 株式現物買付可能額
-    print('株式現物買付可能額= ', json_return.get("sSummaryGenkabuKaituke"))     # 株式現物買付可能額
-    print('NISA口座買付可能額= ', json_return.get("sSummaryNisaKaitukeKanougaku"))     # NISA口座買付可能額
+    print('更新日時= ', dic_return.get("sSummaryUpdate"))     # 株式現物買付可能額
+    print('株式現物買付可能額= ', dic_return.get("sSummaryGenkabuKaituke"))     # 株式現物買付可能額
+    print('NISA口座買付可能額= ', dic_return.get("sSummaryNisaKaitukeKanougaku"))     # NISA口座買付可能額
 
-
-    
     print()    
-    print('p_errno', json_return.get('p_errno'))
-    print('p_err', json_return.get('p_err'))
+    print('p_errno', dic_return.get('p_errno'))
+    print('p_err', dic_return.get('p_err'))
     # 仮想URLが無効になっている場合
-    if json_return.get('p_errno') == '2':
+    if dic_return.get('p_errno') == '2':
         print()    
         print("仮想URLが有効ではありません。")
         print("電話認証＋e_api_login_tel.py実行")
