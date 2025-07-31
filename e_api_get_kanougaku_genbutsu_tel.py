@@ -20,6 +20,7 @@
 # 利用方法: 
 # 事前に「e_api_login_tel.py」を実行して、
 # 仮想URL（1日券）等を取得しておいてください。
+# 「e_api_login_tel.py」と同じディレクトリで実行してください。
 #
 #
 # == ご注意: ========================================
@@ -485,7 +486,7 @@ def func_kanougaku_genbutsu(int_p_no, class_login_property):
 
 if __name__ == "__main__":
     
-    # --- ファイル名等を設定 ------------------------------------------------------------------
+    # --- ファイル名等を設定（実行ファイルと同じディレクトリに有ること）-------------------------------------
     fname_account_info = "e_api_account_info.txt"
     fname_login_response = "e_api_login_response.txt"
     fname_info_p_no = "e_api_info_p_no.txt"
